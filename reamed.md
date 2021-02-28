@@ -1,0 +1,121 @@
+### CMD to run mysql
+```docker run --rm -it -d -v ${PWD}/data:/var./lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password mysql```
+### CMDs for angular
+```
+sudo npm install -g @angular/cli
+npm install
+npm update
+ng serve --open
+http://localhost:4200/home
+```
+### Handling HTTP Request<br>
+- http.Handle - Register a **handler** to handle requests matching a pattern.
+- http.HandleFunc - Registers a **function** to handle requests matching a pattern.
+
+
+### Using http.Handle
+```
+fun Handle(pattern string, handler Handler)
+
+type Handler interface {
+    ServerHTTP(ResponseWriter, *Request)
+}
+///////////
+main.go
+
+import "net/http"
+
+type fooHandler struct {
+    Message string
+}
+
+func (f *fooHandler) ServeHTTP(w http.ResponseWriter, *http.Request) {
+    w.Write([]byte(f.Message))
+}
+
+func main() {
+    http.Handle("/foo", &fooHandler{Message: "hello world"})
+}
+```
+
+### http.HandleFunc
+```
+main.go 
+
+import "net/http"
+
+func main() {
+    foo := func(w http.ResponseWriter, _ *http.Request) {
+        w.Write([]byte(f.Message))    
+    }
+
+    http.HandleFunc("/foo", foo)
+    err := http.ListenAndServe(":5000", nil) // nil for default ServeMux 
+    // for secured http
+    // func ListernAndServeTLS(addr, certFile, keyFile, string, hanlder Handler)
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+```
+### JSON Marshalling and Unmarshalling
+```
+
+type Product struct {
+	ProductID      int    `json:"productId"`
+	Manufacturer   string `json:"manufactorer"`
+	Sku            string `json:"sku"`
+	Upc            string `json:"upc"`
+	PricePerUnit   string `json:"pricePerUnit"`
+	QuantityOnHand string `json:"quantityOnHand"`
+	ProductName    string `json:"productName"`
+}
+
+
+	// Marshalling a struct to JSON
+	data, _ := json.Marshal(&foo{"4score", 56, "Abe", "Lincoln"})
+	fmt.Println(string(data))
+
+	// unmarshalling JSON to struct type
+	f := foo{}
+	err := json.Unmarshal([]byte(`{"Message":"4score","Age":56,"Name":"Abe"}`), &f)
+	if err != nil {
+		log.Fatal((err))
+	}
+
+	fmt.Println(f.Message, f.Age, f.Name)
+```
+
+### Working with Requests
+- Request.Method string
+- Request.Header - Header(map[string][] string)
+- Request.Body - io.ReadCloser
+
+### Middleware
+```
+    func middlewareHandler(func(w http.ResponseWriter, r *http.Request)) {
+        // do stuff before intended handler here
+        hanlder.ServeHTTP(w,r)
+        // do stuff after intended handler here
+    }
+
+    func intendedFunction(w http.ResponseWriter, r *http.Request) {
+        // business logic here 
+    }
+
+    func main() {
+        intendedHandler := http.HandlerFunc(intendedFunction)
+        http.Handle("/foo", middlewareHandler(intendedHandler))
+        http.ListenAndServe(":5000", nil)
+    }
+```
+
+### CORS Headers
+
+main.go
+
+```
+w.Header().Add("Access-Control-Allow-Origin", "*") // "*" allows any origin
+w.Header().Add("Access-Conrol-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+w.Header().Add("Access-Control-Allow-Headers", "Accept, Content-Type, Content- Length, Authorization, X-CSRF-Token, Access-Encoding")
+```
