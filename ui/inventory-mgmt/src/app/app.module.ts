@@ -13,8 +13,6 @@ import { ReportingComponent } from './pages/reporting/reporting.component';
 import { OkDialogComponent } from './shared/components/ok-dialog/ok-dialog.component';
 import { YesNoDialogComponent } from './shared/components/yes-no-dialog/yes-no-dialog.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SideNavComponent } from './side-nav/side-nav.component';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from './shared/modules/material-module/material-module.module';
@@ -31,8 +29,7 @@ import { MaterialModule } from './shared/modules/material-module/material-module
     ReceiptsComponent,
     ReportingComponent,
     OkDialogComponent,
-    YesNoDialogComponent,
-    SideNavComponent
+    YesNoDialogComponent
   ],
   imports: [
     BrowserModule,

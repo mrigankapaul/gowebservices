@@ -1,7 +1,7 @@
-import { Product.Model } from './product.model';
+import { IProduct } from './product.model';
 
-describe('Product.Model', () => {
+describe('IProduct', () => {
   it('should create an instance', () => {
-    expect(new Product.Model()).toBeTruthy();
+    expect(new IProduct()).toBeTruthy();
   });
 });

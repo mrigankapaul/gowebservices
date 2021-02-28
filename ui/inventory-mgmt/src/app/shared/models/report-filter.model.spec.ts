@@ -1,7 +1,7 @@
-import { ReportFilter.Model } from './report-filter.model';
+import { IReportFilter } from './report-filter.model';
 
-describe('ReportFilter.Model', () => {
+describe('IReportFilter', () => {
   it('should create an instance', () => {
-    expect(new ReportFilter.Model()).toBeTruthy();
+    expect(new IReportFilter()).toBeTruthy();
   });
 });

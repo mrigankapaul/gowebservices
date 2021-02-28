@@ -5,6 +5,7 @@ import {Router, ActivatedRoute} from '@angular/router';
 import { IProduct } from 'src/app/shared/models/product.model';
 import {Location} from '@angular/common'; 
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { ProductService } from 'src/app/shared/services/product.service';
 
 @Component({
   selector: 'app-product-details',
@@ -27,7 +28,7 @@ export class ProductDetailsComponent implements OnInit {
   state$: Observable<object>;
   currentProduct: IProduct;
 
-  constructor(public activatedRoute: ActivatedRoute, private router: Router, private fb: FormBuilder, private location: Location, public snackBar: MatSnackBar) {
+  constructor(public activatedRoute: ActivatedRoute, private productsService: ProductService, private router: Router, private fb: FormBuilder, private location: Location, public snackBar: MatSnackBar) {
 
     this.productFg = this.fb.group({
       productName: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
@@ -64,8 +65,11 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   delete(): void{
-    // TODO: delete record
-    this.openSnackBar('success', null);
+    
+    this.productsService.deleteProduct(this.currentProduct).subscribe({
+      complete: () => this.openSnackBar('success', null),
+      error: err => this.errorMessage = err
+    });
     this.returnToProductList();  
   }
 
@@ -82,28 +86,38 @@ export class ProductDetailsComponent implements OnInit {
     this.sku.disable();
     this.upc.setValue(this.currentProduct.upc);
     this.upc.disable();
-    this.pricePerUnit.setValue(this.currentProduct.pricePerUnit);
+    this.pricePerUnit.setValue("$" + this.currentProduct.pricePerUnit);
     this.quantityOnHand.setValue(this.currentProduct.quantityOnHand);
   }
 
-  generateProductFromForm(): IProduct {
+  generateProductFromForm(prodId = 0): IProduct {
     var p = {
-      productId: 0,
+      productId: prodId,
       productName: this.productName.value,
       manufacturer: this.manufacturer.value,
       sku: this.sku.value,
       upc: this.upc.value,
-      pricePerUnit: this.pricePerUnit.value,
+      pricePerUnit: this.pricePerUnit.value.replace("$", ""),
       quantityOnHand: this.quantityOnHand.value
     };
     
     return p;
   }
 
-  onSubmit(product): void {
-    this.currentProduct = this.generateProductFromForm();
-    console.log(this.currentProduct);
-    this.openSnackBar('success', null);
+  onSubmit(): void {
+    if(this.isNew){
+      this.currentProduct = this.generateProductFromForm();
+      this.productsService.postProduct(this.currentProduct).subscribe({
+        complete: () => this.openSnackBar('success', null),
+        error: err => this.errorMessage = err
+      });
+    }else{
+      this.currentProduct = this.generateProductFromForm(this.currentProduct.productId);
+      this.productsService.putProduct(this.currentProduct).subscribe({
+        complete: () => this.openSnackBar('success', null),
+        error: err => this.errorMessage = err
+      });
+    }
     this.returnToProductList();  
   }
 

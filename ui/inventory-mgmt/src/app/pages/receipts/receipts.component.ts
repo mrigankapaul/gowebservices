@@ -3,7 +3,7 @@ import { HttpEventType, HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 import {Sort} from '@angular/material/sort';
 import { catchError, map } from 'rxjs/operators';
-import { ProductService } from 'src/app/shared/services/product.service';
+import { ReceiptService } from 'src/app/shared/services/receipt.service';
 import { IReceipt } from 'src/app/shared/models/receipt.model';
 
 
@@ -14,7 +14,7 @@ import { IReceipt } from 'src/app/shared/models/receipt.model';
 })
 export class ReceiptsComponent implements OnInit {
   @ViewChild("uploader", { static: false }) uploader: ElementRef;
-  constructor(private productsService: ProductService) { }
+  constructor(private receiptsService: ReceiptService) { }
   ngOnInit(): void {
     this.loadReceiptData();
   }
@@ -23,7 +23,7 @@ export class ReceiptsComponent implements OnInit {
   errMsg: string;
   receipts = [];
   sortedData = [];
-  pageTitle: string = " Product Inventory Receipts";
+  pageTitle: string = " Inventory Receipts";
 
 
   uploadClick() {
@@ -39,9 +39,9 @@ export class ReceiptsComponent implements OnInit {
 
   uploadReceipt(file) {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('receipt', file);
     file.inProgress = true;
-    this.productsService.upload(formData)
+    this.receiptsService.upload(formData)
     .pipe(
       map(event => {
         switch (event.type) {
@@ -56,6 +56,7 @@ export class ReceiptsComponent implements OnInit {
         if (typeof (event) === 'object') {
           console.log(event.body);
         }
+        this.loadReceiptData();
       });
   }
 
@@ -75,13 +76,19 @@ export class ReceiptsComponent implements OnInit {
     });
   }
 
+  getDownloadUrl(name: string): string {
+    return this.receiptsService.generateUrl(name);
+  }
 
-  downloadReciept(receipt: IReceipt): void{
-    alert(receipt.receiptId);
+  downloadData(data: Response) {
+    
+    // const blob = new Blob([data], { type: 'text/csv' });
+    const url= window.URL.createObjectURL(data.blob);
+    window.open(url);
   }
 
   loadReceiptData(): void {
-    this.productsService.getReceipts().subscribe({
+    this.receiptsService.getReceipts().subscribe({
       next: receipts => {
         this.receipts = receipts;
         this.sortedData = receipts;

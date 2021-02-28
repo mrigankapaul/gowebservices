@@ -1,5 +1,5 @@
 export interface IReportFilter {
-    skuFilter: string;
-    manufacturerFilter: string;
-    productFilter: string;
+    sku: string;
+    manufacturer: string;
+    productName: string;
 }

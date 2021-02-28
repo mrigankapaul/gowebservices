@@ -1,7 +1,7 @@
-import { Receipt.Model } from './receipt.model';
+import { IReceipt } from './receipt.model';
 
-describe('Receipt.Model', () => {
+describe('IReceipt', () => {
   it('should create an instance', () => {
-    expect(new Receipt.Model()).toBeTruthy();
+    expect(new IReceipt()).toBeTruthy();
   });
 });

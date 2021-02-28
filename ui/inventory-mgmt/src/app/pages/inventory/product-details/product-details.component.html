@@ -2,7 +2,7 @@
   <div class='card-header title'>
     {{pageTitle}}
 </div>
-<form novalidate (ngSubmit)="onSubmit(productFg)" [formGroup]="productFg" >
+<form novalidate (ngSubmit)="onSubmit()" [formGroup]="productFg" >
     <fieldset class="product-details-form">
       <mat-form-field class="full-width mat-icon-left">
         <input [formControl]="productName" required matInput type="text" name="productName" id="productName"

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { IReportFilter } from 'src/app/shared/models/report-filter.model';
+import { ProductService } from 'src/app/shared/services/product.service';
 
 @Component({
   selector: 'app-reporting',
@@ -20,7 +21,7 @@ export class ReportingComponent implements OnInit {
   manufacturerFilter: AbstractControl;
   productFilter: AbstractControl;
 
-  constructor(private router: Router, private fb: FormBuilder, public snackBar: MatSnackBar) {
+  constructor(private router: Router, private fb: FormBuilder, public snackBar: MatSnackBar, private productsService: ProductService) {
     this.reportParamsFg = this.fb.group({
       skuFilter: ['', Validators.compose([Validators.maxLength(30)])],
       manufacturerFilter: ['', Validators.compose([Validators.minLength(30)])],
@@ -45,19 +46,19 @@ export class ReportingComponent implements OnInit {
 
   generateReportFilterFromForm(): IReportFilter {
     var f = {
-      skuFilter: this.skuFilter.value,
-      manufacturerFilter: this.manufacturerFilter.value,
-      productFilter: this.productFilter.value
+      sku: this.skuFilter.value,
+      manufacturer: this.manufacturerFilter.value,
+      productName: this.productFilter.value
     };
     return f;
   }
 
-  onSubmit(product): void {
+  onSubmit(product) {
     this.reportFilters = this.generateReportFilterFromForm();
-    // TODO: post filters to web service
+    this.productsService.retrieveProductReport(this.reportFilters);
     console.log(this.reportFilters);
     this.openSnackBar('success', null);
-    this.router.navigate(['/']);
+    // this.router.navigate(['/']);
   }
 
   openSnackBar(message: string, action: string) {

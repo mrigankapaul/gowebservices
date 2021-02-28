@@ -4,6 +4,9 @@ import { ProductService } from 'src/app/shared/services/product.service';
 import { IProduct } from '../../shared/models/product.model'
 import {Sort} from '@angular/material/sort';
 import {Router} from '@angular/router';
+import { WebsocketService } from 'src/app/shared/services/websocket.service';
+import { ISocketMessage } from 'src/app/shared/models/socket-message.model';
+import { DashboardService } from 'src/app/shared/services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,13 +21,24 @@ export class DashboardComponent implements OnInit {
   imageMargin: number = 2;
   showImage: boolean = false;
   errorMessage: string;
+  ioConnection: any;
+
+  messages: ISocketMessage[] = [];
+  messageContent: string;
 
   topProducts: any[] = [];
-  constructor(private productsService: ProductService, private router: Router) { }
+  constructor(private productsService: ProductService, private dashboardService: DashboardService, private router: Router) { 
+    dashboardService.messages.subscribe(msg => {
+// TODO: populate data on page
+      console.log(msg);
+      this.topProducts = msg.data;
+    });
+  }
 
   ngOnInit(): void {
     this.loadProductData();
   }
+
 
   loadProductData(): void {
     this.productsService.getProducts().subscribe({

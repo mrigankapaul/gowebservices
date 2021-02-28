@@ -1,19 +1,30 @@
-@import  '../../../styles.scss';
+@import "../../../styles.scss";
 
 .upload-box {
      margin-top: 25px;
      margin-left: 20px;
 }
 
-
-table{
+table {
      width: 100%;
      height: 100%;
-     margin-top: .5em;
- }
- 
- .mat-row:hover {
-   cursor: pointer;
-   background-color: $main-color;
-   color: $light-text-color;
- }
+     margin-top: 0.5em;
+}
+
+.mat-row:hover {
+     background-color: $main-color;
+     color: $light-text-color;
+     a {
+          color: $light-text-color;
+     }
+}
+
+a:hover {
+     cursor: pointer;     
+     
+}
+
+a {
+     color: black;
+     text-decoration: none !important;
+}
