@@ -160,3 +160,39 @@ type Result interface {
     RowsAffected() (int64, error)
 }
 ```
+
+### Context 
+
+    - Allows you to set deadline, cancel a signal, or set other request-scoped values across API boundaries and between processes.
+
+### Uploading and downloading files
+
+- Base64 encoding 
+    ```
+    func (enc *Encoding) DecodeString(s string)([] byte, error)
+    ```
+    ```
+        str := "scnksncksnckscks"
+        output, err := base64.StdEncoding.DecodeString(str)
+        if err != nil {
+            log.Fatal(err)
+        }
+        fmt.Println("%d\n", output)
+    ```
+- Multi-part 
+    ```
+        func(r *Request) FormFile(key string) (multipart.File, *multiart.FileHeader, error)
+
+        type File interface {
+            io.Reader
+            io.ReaderAt
+            io.Seeker
+            io.Closer
+        }
+
+        type FileHeader struct {
+            Filename string
+            Header textproto.MIMEHEader
+            Size int64
+        }
+    ```
