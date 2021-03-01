@@ -196,3 +196,20 @@ type Result interface {
             Size int64
         }
     ```
+
+### WebSockets
+    - Client sends HTTp GET request 
+        - Connection:Upgrade
+        - Upgrade:websocket
+        - Sec-WebSocket-Key:key
+    - Server Response with status code of 101
+        - switching protocols
+        - Connection:Upgrade
+        - Upgrade:websocket
+        - Sec-WebSocket-Key:key
+```
+type Conn struct {
+    PayloadType byte
+    MaxPayloadBytes int
+}
+```
