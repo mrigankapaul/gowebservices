@@ -55,7 +55,7 @@ func productsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = addOrUpdateProduct(newProduct)
+		_, err = insertProduct(newProduct)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -99,25 +99,25 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(productJSON)
 	case http.MethodPut:
-		var updateProduct Product
+		var updateSingleProduct Product
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		err = json.Unmarshal(bodyBytes, &updateProduct)
+		err = json.Unmarshal(bodyBytes, &updateSingleProduct)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		if updateProduct.ProductID != productID {
+		if updateSingleProduct.ProductID != productID {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		addOrUpdateProduct(updateProduct)
+		err = updateProduct(updateSingleProduct)
 		w.WriteHeader(http.StatusOK)
 	case http.MethodDelete:
 		removeProduct(productID)

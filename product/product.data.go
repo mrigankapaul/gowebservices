@@ -2,52 +2,10 @@ package product
 
 import (
 	"database/sql"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"log"
-	"os"
-	"sort"
-	"sync"
 
 	"example.com/inventoryservice/database"
 )
-
-// used to hold our product list in memory
-var productMap = struct {
-	sync.RWMutex
-	m map[int]Product
-}{m: make(map[int]Product)}
-
-func init() {
-	fmt.Println("loading products...")
-	prodMap, err := loadProductMap()
-	productMap.m = prodMap
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%d products loaded...\n", len(productMap.m))
-}
-
-func loadProductMap() (map[int]Product, error) {
-	fileName := "products.json"
-	_, err := os.Stat(fileName)
-	if os.IsNotExist(err) {
-		return nil, fmt.Errorf("file [%s] does not exist", fileName)
-	}
-
-	file, _ := ioutil.ReadFile(fileName)
-	productList := make([]Product, 0)
-	err = json.Unmarshal([]byte(file), &productList)
-	if err != nil {
-		log.Fatal(err)
-	}
-	prodMap := make(map[int]Product)
-	for i := 0; i < len(productList); i++ {
-		prodMap[productList[i].ProductID] = productList[i]
-	}
-	return prodMap, nil
-}
 
 func getProduct(productID int) (*Product, error) {
 	row := database.DbConn.QueryRow(`SELECT 
@@ -80,14 +38,7 @@ func getProduct(productID int) (*Product, error) {
 	return product, nil
 }
 
-func removeProduct(productID int) {
-	productMap.Lock()
-	defer productMap.Unlock()
-	delete(productMap.m, productID)
-}
-
 func getProductList() ([]Product, error) {
-
 	results, err := database.DbConn.Query(`SELECT 
 	productId, 
 	manufacturer, 
@@ -98,9 +49,9 @@ func getProductList() ([]Product, error) {
 	productName 
 	FROM products`)
 	if err != nil {
-		log.Println(err.Error())
 		return nil, err
 	}
+
 	defer results.Close()
 	products := make([]Product, 0)
 	for results.Next() {
@@ -118,41 +69,57 @@ func getProductList() ([]Product, error) {
 	return products, nil
 }
 
-func getProductIds() []int {
-	productMap.RLock()
-	productIds := []int{}
-	for key := range productMap.m {
-		productIds = append(productIds, key)
+func removeProduct(productID int) error {
+	_, err := database.DbConn.Exec(`DELETE FROM products where productId = ?`, productID)
+	if err != nil {
+		return err
 	}
-	productMap.RUnlock()
-	sort.Ints(productIds)
-	return productIds
+	return nil
 }
 
-func getNextProductID() int {
-	productIds := getProductIds()
-	return productIds[len(productIds)-1] + 1
+func updateProduct(product Product) error {
+
+	_, err := database.DbConn.Exec(`UPDATE products SET 
+		manufacturer=?, 
+		sku=?, 
+		upc=?, 
+		pricePerUnit=CAST(? AS DECIMAL(13,2)), 
+		quantityOnHand=?, 
+		productName=?
+		WHERE productId=?`,
+		product.Manufacturer,
+		product.Sku,
+		product.Upc,
+		product.PricePerUnit,
+		product.QuantityOnHand,
+		product.ProductName,
+		product.ProductID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func addOrUpdateProduct(product Product) (int, error) {
-	// if the product id is set, update, otherwise add
-	addOrUpdateID := -1
-	if product.ProductID > 0 {
-		oldProduct, err := getProduct(product.ProductID)
-		if err != nil {
-			return addOrUpdateID, err
-		}
-		// if it exists, replace it, otherwise return error
-		if oldProduct == nil {
-			return 0, fmt.Errorf("product id [%d] doesn't exist", product.ProductID)
-		}
-		addOrUpdateID = product.ProductID
-	} else {
-		addOrUpdateID = getNextProductID()
-		product.ProductID = addOrUpdateID
+func insertProduct(product Product) (int, error) {
+	result, err := database.DbConn.Exec(`INSERT INTO products  
+	(manufacturer, 
+	sku, 
+	upc, 
+	pricePerUnit, 
+	quantityOnHand, 
+	productName) VALUES (?, ?, ?, ?, ?, ?)`,
+		product.Manufacturer,
+		product.Sku,
+		product.Upc,
+		product.PricePerUnit,
+		product.QuantityOnHand,
+		product.ProductName)
+	if err != nil {
+		return 0, err
 	}
-	productMap.Lock()
-	productMap.m[addOrUpdateID] = product
-	productMap.Unlock()
-	return addOrUpdateID, nil
+	insertID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return int(insertID), nil
 }

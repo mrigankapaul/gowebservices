@@ -149,3 +149,14 @@ func (rs *Rows) Scan(dest ...interface{}) error
 func (db *DB) QueryRow(query string, args ...interface{}) *Row // when the result in only 1 row.
 func (rs *Row) Scan(dest ...interface{}) error
 ```
+
+### Executing SQL Statements
+
+```
+func (rs *DB) Exec(query string, args ...interface{}) (Result, error)
+
+type Result interface {
+    LastInsertId() (int64, error)
+    RowsAffected() (int64, error)
+}
+```
