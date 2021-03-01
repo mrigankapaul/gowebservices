@@ -208,8 +208,19 @@ type Result interface {
         - Upgrade:websocket
         - Sec-WebSocket-Key:key
 ```
-type Conn struct {
+type Conn struct { // webscocket.conn websocket connection type
     PayloadType byte
     MaxPayloadBytes int
 }
+
+type Codec struct { // Codec
+    Marhsal func(v interface{}) (data []byte, payloadType byte, err error)
+    Unmarshal func(data []byte, payloadType byte, v interface{}) (err error)
+}
+
+codec.Receive
+
+func (cd Codec) Receive(ws *Conn, v interface{}) (err error)
+func (cd Codec) Send(ws *Conn, v interface{}) (err error)
+
 ```
