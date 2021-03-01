@@ -1,5 +1,8 @@
 ### CMD to run mysql
-```docker run --rm -it -d -v ${PWD}/data:/var./lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password mysql```
+```
+docker run --rm -it -d -v ${PWD}/data:/var./lib/mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password mysql
+docker exec -it beautiful_grothendieck sh -c 'exec mysql -uroot -p"password"'
+```
 ### CMDs for angular
 ```
 sudo npm install -g @angular/cli
@@ -118,4 +121,31 @@ main.go
 w.Header().Add("Access-Control-Allow-Origin", "*") // "*" allows any origin
 w.Header().Add("Access-Conrol-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 w.Header().Add("Access-Control-Allow-Headers", "Accept, Content-Type, Content- Length, Authorization, X-CSRF-Token, Access-Encoding")
+```
+
+### Connecting to a database
+
+database.go
+
+```
+imort "database/sql"
+
+var DbConn *sql.DB
+
+func SetupDatabase() {
+    var err error 
+    DBConn, err = sql.Open("mysql", "root:password@tcp(127.0.0.1:3306)/inventorydb)
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+```
+
+### Querying the database
+
+```
+func (db *DB) Query(query string, args ...interface{}) (*Rows, error)
+func (rs *Rows) Scan(dest ...interface{}) error
+func (db *DB) QueryRow(query string, args ...interface{}) *Row // when the result in only 1 row.
+func (rs *Row) Scan(dest ...interface{}) error
 ```
