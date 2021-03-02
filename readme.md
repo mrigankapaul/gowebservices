@@ -224,3 +224,84 @@ func (cd Codec) Receive(ws *Conn, v interface{}) (err error)
 func (cd Codec) Send(ws *Conn, v interface{}) (err error)
 
 ```
+
+### Templates
+
+    - text/template - Basic functionality for working with templates with Go.
+    -  html/template - Same interface but with added security for HTML output.
+
+```
+func New(name string) *Template // to create a new templare.
+func (t *template) Parse(text string) (*Template, error) // parse the template.
+func (t *template) Execute(wr io.Writer, data interface{}) error // to generate the output
+```
+
+```
+package main
+
+import (
+	"html/template"
+	"os"
+)
+
+type BlogPost struct {
+	Title   string
+	Content string
+}
+
+func main() {
+	post := BlogPost{"First Post", "This is the blog post content section"}
+	tmpl, err := template.New("blog-tmpl").Parse("<h1>{{.Title}}</h1><div><p>{{.Content}}</p></div>")
+	if err != nil {
+		panic(err)
+	}
+	err = tmpl.Execute(os.Stdout, post)
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
+
+### Pipelines
+
+Command or Sequence of Commands
+
+    - Simple Value(argument) // {{ "Hello" }} {{1234}} {{ .Message }}
+    - Function or Method Calls // {{ println "hi" }} {{ .SayHello "Bye" }}
+
+Pipleline Chaining
+
+    - {{ "Hello" | .SaySomething | printf "%s %s"" "World" }}
+
+Pipeline Looping
+
+    - {{ range pipeline }} T1 {{ end }}
+    - {{ range pipeline }} T1 {{ else }} T2 {{ end }}
+    - {{ range $index, $element := pipeline  }}
+
+
+### More anout templates
+
+Template Functions
+    - and {{if and true true true}} {{end}}
+    - or  {{if or true false false true}} {{end}}
+    - index {{index.1}}
+    - len {{len .}}
+    - not {{ if not false}}
+    - print, printf, println {{println "hey"}}
+
+Template Operator
+    - eq
+    - ne
+    - lt
+    - le
+    - gt 
+    - ge
+
+Template Functions
+
+```
+    func (t *template) Funcs(funcMap FuncMap) *Template
+    type FuncMap map[string]interface{}
+```
